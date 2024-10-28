@@ -9,20 +9,21 @@ RUN python3 -m venv /opt/venv && \
     . /opt/venv/bin/activate && \
     pip install awscli
 
+# Create necessary directories and set permissions
+RUN mkdir -p /etc/privoxy && \
+    chown -R privoxy /etc/privoxy
+
 # Add Privoxy configuration files
 ADD eksconfig /etc/privoxy/config
 ADD eks.action /etc/privoxy/eks.action
 ADD eks.filter /etc/privoxy/eks.filter
 
-# Set ownership for Privoxy configuration files
-RUN chown -R privoxy /etc/privoxy
-
-# Add the script that sets up EKS and Privoxy
+# Add the k8s-eks.sh script and make it executable
 ADD k8s-eks.sh /
 RUN chmod +x /k8s-eks.sh
 
 # Expose Privoxy port
 EXPOSE 8118/tcp
 
-# Run the script on container start
-ENTRYPOINT ["/opt/venv/bin/python3", "/k8s-eks.sh"]
+# Set ENTRYPOINT to the script
+ENTRYPOINT ["/k8s-eks.sh"]

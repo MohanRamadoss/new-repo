@@ -18,9 +18,8 @@ export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
 # Get the cluster name from the first argument
 export CLUSTER_NAME=$1
 
-# Get the private EKS endpoint
+# Retrieve the private EKS endpoint and DNS name
 INTERNAL_ENDPOINT=$(aws eks describe-cluster --name "$CLUSTER_NAME" --query "cluster.endpoint" --output text)
-# Strip https:// from the endpoint
 DNSNAME=$(echo "$INTERNAL_ENDPOINT" | sed 's/https:\/\///')
 
 # Replace placeholders in the Privoxy configuration files with actual EKS endpoint values
