@@ -1,0 +1,7 @@
+# Block everything by default
+{+block{Not EKS endpoint}}
+/
+
+# Allow traffic to the EKS endpoint and apply the eks-private filter
+{+client-header-filter{eks-private} -block{Kubernetes}}
+CLUSTER_ENDPOINT/
