@@ -1,0 +1,9 @@
+confdir /etc/privoxy
+# Block other requests and Allow EKS endpoint access only
+actionsfile /etc/privoxy/eks.action
+# Rewrite https://CLUSTER_ENDPOINT to https://kubernetes.default
+filterfile /etc/privoxy/eks.filter
+# Don't show the pod name in errors
+hostname kubernetes-privoxy
+# Bind to all interfaces, port :8118
+listen-address 0.0.0.0:8118

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-api-proxy
+  namespace: proxy
+  labels:
+    run: k8s-api-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: k8s-api-proxy
+  template:
+    metadata:
+      labels:
+        run: k8s-api-proxy
+    spec:
+      containers:
+        - name: k8s-api-proxy
+          image: 036833109213.dkr.ecr.eu-west-1.amazonaws.com/prod/hyc/image/aap-ee:v7
+          env:
+            - name: AWS_DEFAULT_REGION
+              value: eu-west-1
+            - name: AWS_ROLE_ARN
+              value: arn:aws:iam::036833109213:role/irsa-eks-cluster
+            - name: AWS_WEB_IDENTITY_TOKEN_FILE
+              value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+            - name: CLUSTER_NAME
+              value: "ie-p-mgmt-primary"
+          ports:
+            - containerPort: 8118
+              protocol: TCP
+          volumeMounts:
+            - name: aws-iam-token
+              mountPath: /var/run/secrets/eks.amazonaws.com/serviceaccount
+              readOnly: true
+      volumes:
+        - name: aws-iam-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  audience: sts.amazonaws.com
+                  expirationSeconds: 86400
+                  path: token
+      serviceAccountName: proxy
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
